@@ -19,4 +19,13 @@
 #define FATFS_FLASH_CREATE_FILE_ON_DISK_CREATE_FILE_CONTENT "Pico flash as an FAT disk!\r\nFiles and folders may be added and removed here\r\n"
 
 
+/* Definitions of physical drive number for each drive */
+enum EDriveType
+{
+    EDriveType_Flash,
+    EDriveType_USB,
+    EDriveType_SD
+};
+
+
 #endif //FATFS_FLASH_COMMON_H

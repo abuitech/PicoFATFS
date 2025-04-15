@@ -3,6 +3,7 @@
 
 #include "usb_msc_callbacks.h"
 #include "fatfs_disk.h"
+#include "ff.h"
 
 #include "bsp/board.h"
 #include "tusb.h"
@@ -29,6 +30,34 @@ void blink_led_task(void)
     led_state = !led_state;
 }
 
+//--------------------------------------------------------------------+
+//
+//--------------------------------------------------------------------+
+void TestSample()
+{
+    static bool testDone = false;
+    if (testDone)
+        return;
+
+    TCHAR str[FF_MAX_LFN];
+    FRESULT fr;
+    FIL fil;
+
+    f_open(&fil, "flash:/test.txt", FA_CREATE_NEW | FA_WRITE);
+    f_puts("flash:/test.txt ...", &fil);
+    f_close(&fil);
+
+    f_mkdir("flash:/test_folder");
+    f_open(&fil, "flash:/test_folder/test_in_test_folder.txt", FA_CREATE_NEW | FA_WRITE);
+    f_puts("flash:/test_folder/test_in_test_folder.txt ...", &fil);
+    f_close(&fil);
+
+    fr = f_getcwd(str, FF_MAX_LFN);
+    printf("\tcwd=%s\n", str);      // OUPUT: cwd=flash:/
+    f_mount(0, "flash", 0);
+
+    testDone = true;
+}
 
 //--------------------------------------------------------------------+
 //
@@ -41,7 +70,17 @@ int main()
 
     printf("\n\nPico FAT FS\n\n");
 
-    create_fatfs_disk();
+    if (!mount_fatfs_disk())
+    {
+        printf("\tCreating FAT Filesystem disk\n");
+        create_fatfs_disk();
+    }
+
+    FATFS fs;
+    if (f_mount(&fs, "flash", 0) != FR_OK)
+    {
+        printf("\tError:mount has failed!\n");
+    }
 
     while (true)
     {
@@ -49,5 +88,6 @@ int main()
         cdc_task();
 
         blink_led_task();
+        TestSample();
     }
 }
