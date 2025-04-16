@@ -90,6 +90,7 @@ set(SourceFileList
 # ====================================================================================
 set(DefineList
     #HAS_DEV_FLASH_IMPL
+    FATFS_FLASH_CONF="fatfs_flash_conf.h"
 )
 
 

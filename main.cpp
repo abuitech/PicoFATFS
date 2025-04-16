@@ -39,12 +39,18 @@ void TestSample()
     if (testDone)
         return;
 
+    printf("Executing... TestSample()!\n");
+
     TCHAR str[FF_MAX_LFN];
     FRESULT fr;
     FIL fil;
 
-    f_open(&fil, "flash:/test.txt", FA_CREATE_NEW | FA_WRITE);
-    f_puts("flash:/test.txt ...", &fil);
+    f_open(&fil, "/test1.txt", FA_CREATE_NEW | FA_WRITE);
+    f_puts("flash:/test1.txt ...", &fil);
+    f_close(&fil);
+
+    f_open(&fil, "flash:/test2.txt", FA_CREATE_NEW | FA_WRITE);
+    f_puts("flash:/test2.txt ...", &fil);
     f_close(&fil);
 
     f_mkdir("flash:/test_folder");
@@ -70,12 +76,14 @@ int main()
 
     printf("\n\nPico FAT FS\n\n");
 
+    printf("Executing... mount_fatfs_disk()\n");
     if (!mount_fatfs_disk())
     {
         printf("\tCreating FAT Filesystem disk\n");
         create_fatfs_disk();
     }
 
+    printf("Executing... f_mount(&fs, \"flash\", 0)\n");
     FATFS fs;
     if (f_mount(&fs, "flash", 0) != FR_OK)
     {

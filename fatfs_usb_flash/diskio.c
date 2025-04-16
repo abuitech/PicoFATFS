@@ -12,6 +12,9 @@
 
 #include "fatfs_disk.h"
 
+#include <stdio.h>
+#include "pico/stdlib.h"
+
 /*-----------------------------------------------------------------------*/
 /* Get Drive Status                                                      */
 /*-----------------------------------------------------------------------*/
@@ -22,6 +25,8 @@ DSTATUS disk_status(
 {
     DSTATUS stat;
     int result;
+
+    printf("disk_status: pdrv=%i\n", pdrv);
 
     switch (pdrv)
     {
@@ -47,6 +52,8 @@ DSTATUS disk_initialize(
 {
     DSTATUS stat;
     int result;
+
+    printf("disk_initialize: pdrv=%i\n", pdrv);
 
     if (pdrv == EDriveType_Flash)
     {
@@ -117,6 +124,8 @@ DRESULT disk_ioctl(
 {
     DRESULT res;
     int result;
+
+    printf("disk_ioctl: pdrv=%i\n", pdrv);
 
     if (pdrv == EDriveType_Flash)
     {
