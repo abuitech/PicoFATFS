@@ -50,8 +50,9 @@ pico_sdk_init()
 
 
 # FatFS source path
-set(FATFS_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/fatfs_0_1_5a/source)
-set(FATFS_USB_FLASH_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/fatfs_usb_flash)
+set(PICOFATFS_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR})
+set(FATFS_SOURCE_DIR ${PICOFATFS_SOURCE_DIR}/fatfs_0_1_5a/source)
+set(FATFS_USB_FLASH_SOURCE_DIR ${PICOFATFS_SOURCE_DIR}/fatfs_usb_flash)
 
 
 # ====================================================================================
@@ -91,6 +92,7 @@ set(SourceFileList
 set(DefineList
     #HAS_DEV_FLASH_IMPL
     FATFS_FLASH_CONF="fatfs_flash_conf.h"
+    SYS_CLK_MHZ=200
 )
 
 

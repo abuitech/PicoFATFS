@@ -26,7 +26,7 @@ DSTATUS disk_status(
     DSTATUS stat;
     int result;
 
-    printf("disk_status: pdrv=%i\n", pdrv);
+    // printf("disk_status: pdrv=%i\n", pdrv);
 
     switch (pdrv)
     {
