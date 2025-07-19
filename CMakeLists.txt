@@ -23,16 +23,20 @@ if (EXISTS ${picoVscode})
     include(${picoVscode})
 endif()
 # ====================================================================================
-set(PICO_BOARD pico CACHE STRING "Board type")
+set(PICO_BOARD myboard_pico CACHE STRING "Board type")
+set(PICO_BOARD_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR})
 
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico_sdk_import.cmake)
+
+# PicoFatFS shared cmake
+include (shared.cmake)
 
 # ====================================================================================
 #
 #
 
-set(TARGET_VERSION v0.1)
+set(TARGET_VERSION v0.2)
 set(TARGET_NAME PicoFATFS_${TARGET_VERSION})
 
 #
@@ -44,15 +48,6 @@ project(${TARGET_NAME} C CXX ASM)
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()
 
-
-# ====================================================================================
-# ====================================================================================
-
-
-# FatFS source path
-set(PICOFATFS_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR})
-set(FATFS_SOURCE_DIR ${PICOFATFS_SOURCE_DIR}/fatfs_0_1_5a/source)
-set(FATFS_USB_FLASH_SOURCE_DIR ${PICOFATFS_SOURCE_DIR}/fatfs_usb_flash)
 
 
 # ====================================================================================
@@ -72,18 +67,8 @@ set(IncludePaths
 # ====================================================================================
 set(SourceFileList
     ${CMAKE_CURRENT_LIST_DIR}/main.cpp
-# FatFS source files
-    # ${FATFS_SOURCE_DIR}/diskio.c
-    ${FATFS_SOURCE_DIR}/ff.c
-    ${FATFS_SOURCE_DIR}/ffsystem.c
-    ${FATFS_SOURCE_DIR}/ffunicode.c
-# FatFS USB Flash impl source files
-    ${FATFS_USB_FLASH_SOURCE_DIR}/diskio.c
-    ${FATFS_USB_FLASH_SOURCE_DIR}/fatfs_disk.c
-    ${FATFS_USB_FLASH_SOURCE_DIR}/fatfs_flash.c
-    ${FATFS_USB_FLASH_SOURCE_DIR}/usb_descriptors.c
-    ${FATFS_USB_FLASH_SOURCE_DIR}/usb_msc_callbacks.c
-    ${FATFS_USB_FLASH_SOURCE_DIR}/usb_msc_driver.c
+    ${FatFsSourceList}
+    ${FatFsUsbImplSourceList}
 )
 
 # ====================================================================================
@@ -92,7 +77,12 @@ set(SourceFileList
 set(DefineList
     #HAS_DEV_FLASH_IMPL
     FATFS_FLASH_CONF="fatfs_flash_conf.h"
-    SYS_CLK_MHZ=200
+    PICO_PLATFORM=rp2040
+    SYS_CLK_MHZ=360
+    PLL_SYS_VCO_FREQ_HZ=1500000000
+    PLL_SYS_POSTDIV1=5
+    PLL_SYS_POSTDIV2=2
+    SYS_CLK_VREG_VOLTAGE_MIN=VREG_VOLTAGE_1_30
 )
 
 
