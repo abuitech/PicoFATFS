@@ -33,16 +33,16 @@ void measure_freqs(void)
     uint f_clk_rtc = frequency_count_khz(CLOCKS_FC0_SRC_VALUE_CLK_RTC);
 #endif
 
-    printf("Frequencies :\n");
-    printf("\tpll_sys  = %dkHz\n", f_pll_sys);
-    printf("\tpll_usb  = %dkHz\n", f_pll_usb);
-    printf("\trosc     = %dkHz\n", f_rosc);
-    printf("\tclk_sys  = %dkHz\n", f_clk_sys);
-    printf("\tclk_peri = %dkHz\n", f_clk_peri);
-    printf("\tclk_usb  = %dkHz\n", f_clk_usb);
-    printf("\tclk_adc  = %dkHz\n", f_clk_adc);
+    printf(">> Frequencies :\n");
+    printf(">> \tpll_sys  = %dkHz\n", f_pll_sys);
+    printf(">> \tpll_usb  = %dkHz\n", f_pll_usb);
+    printf(">> \trosc     = %dkHz\n", f_rosc);
+    printf(">> \tclk_sys  = %dkHz\n", f_clk_sys);
+    printf(">> \tclk_peri = %dkHz\n", f_clk_peri);
+    printf(">> \tclk_usb  = %dkHz\n", f_clk_usb);
+    printf(">> \tclk_adc  = %dkHz\n", f_clk_adc);
 #ifdef CLOCKS_FC0_SRC_VALUE_CLK_RTC
-    printf("\tclk_rtc  = %dkHz\n", f_clk_rtc);
+    printf(">> \tclk_rtc  = %dkHz\n", f_clk_rtc);
 #endif
 
     // Can't measure clk_ref / xosc as it is the ref
@@ -64,7 +64,7 @@ void blink_led_task(void)
     }
     start_ms += interval_ms;
 
-    // printf("Led state : %s\n", led_state ? "on" : "off");
+    // printf(">> Led state : %s\n", led_state ? "on" : "off");
     board_led_write(led_state);
     led_state = !led_state;
 }
@@ -74,32 +74,52 @@ void blink_led_task(void)
 //--------------------------------------------------------------------+
 void CopyTest(const char* srcFilepath, const char* dstFilepath)
 {
-    const UINT BufferSize{1024};
+    const UINT BufferSize{512};
     uint8_t buffer[BufferSize];
     FRESULT fr;
     FIL srcFil, dstFil;
 
-    printf("CopyTest: copy '%s' to '%s'\n", srcFilepath, dstFilepath);
-    
+    printf(">> CopyTest: copy '%s' to '%s'\n", srcFilepath, dstFilepath);
+
     FILINFO fno;
+
+    if ((fr = f_stat(dstFilepath, &fno)) == FR_OK)
+    {
+        printf(">> Target file '%s' exists. Deleting target file.\n", dstFilepath);
+        if (f_unlink(dstFilepath) != FR_OK)
+        {
+            printf(">> CopyTest has failed! Error deleting target file.\n");
+            return;
+        }
+    }
+
+    tud_task(); // tinyusb device task
+    cdc_task();
+
     if ((fr = f_stat(srcFilepath, &fno)) != FR_OK)
     {
-        printf("CopyTest has failed! Error on f_stat('%s') (fr=%i)\n", srcFilepath, fr);
+        printf(">> CopyTest has failed! Error on f_stat('%s') (fr=%i)\n", srcFilepath, fr);
         return;
     }
 
+    tud_task(); // tinyusb device task
+    cdc_task();
+
     if ((fr = f_open(&srcFil, srcFilepath, FA_OPEN_EXISTING | FA_READ)) != FR_OK)
     {
-        printf("CopyTest has failed! Error on opening '%s' (fr=%i)\n", srcFilepath, fr);
+        printf(">> CopyTest has failed! Error on opening '%s' (fr=%i)\n", srcFilepath, fr);
         return;
     }
 
     if ((fr = f_open(&dstFil, dstFilepath, FA_CREATE_ALWAYS | FA_WRITE)) != FR_OK)
     {
-        printf("CopyTest has failed! Error on opening '%s' (fr=%i)\n", dstFilepath, fr);
+        printf(">> CopyTest has failed! Error on opening '%s' (fr=%i)\n", dstFilepath, fr);
         f_close(&srcFil);
         return;
     }
+
+    tud_task(); // tinyusb device task
+    cdc_task();
 
     FSIZE_t copyCount{0};
     while (copyCount < fno.fsize)
@@ -109,28 +129,33 @@ void CopyTest(const char* srcFilepath, const char* dstFilepath)
         fr = f_read(&srcFil, buffer, nToRead, &nRead);
         if (fr != FR_OK || nRead != nToRead)
         {
-            printf("CopyTest has failed! Error on reading '%s' (fr=%i, copyCount=%lu, nToRead=%lu, nRead=%lu)\n", dstFilepath, fr, copyCount, nToRead, nRead);
+            printf(">> CopyTest has failed! Error on reading '%s' (fr=%i, copyCount=%lu, nToRead=%lu, nRead=%lu)\n", dstFilepath, fr, copyCount, nToRead, nRead);
             goto CopyTest_exit;
         }
+
+        tud_task(); // tinyusb device task
+        cdc_task();
 
         fr = f_write(&dstFil, buffer, nRead, &nWrite);
         if (fr != FR_OK || nWrite != nRead)
         {
-            printf("CopyTest has failed! Error on writing '%s' (fr=%i, copyCount=%lu, nToWrite=%lu, nWrite=%lu)\n", dstFilepath, fr, copyCount, nRead, nWrite);
+            printf(">> CopyTest has failed! Error on writing '%s' (fr=%i, copyCount=%lu, nToWrite=%lu, nWrite=%lu)\n", dstFilepath, fr, copyCount, nRead, nWrite);
             goto CopyTest_exit;
         }
 
         copyCount += nWrite;
 
+        f_sync(&dstFil);
+
         tud_task(); // tinyusb device task
         cdc_task();
     }
 
-    printf("CopyTest done.");
+    printf(">> CopyTest done : %lu bytes are copied (source file size:%lu).\n", copyCount, fno.fsize);
 
 CopyTest_exit:
-    f_close(&srcFil);
     f_close(&dstFil);
+    f_close(&srcFil);
 }
 
 //--------------------------------------------------------------------+
@@ -142,7 +167,7 @@ void TestSample()
     if (testDone)
         return;
 
-    printf("Executing... TestSample()!\n");
+    printf(">> Executing... TestSample()!\n");
 
     TCHAR str[FF_MAX_LFN];
     FRESULT fr;
@@ -164,7 +189,7 @@ void TestSample()
     CopyTest("/copytest_source.bin", "/copytest_target.bin");
 
     fr = f_getcwd(str, FF_MAX_LFN);
-    printf("\tcwd=%s\n", str);      // OUPUT: cwd=flash:/
+    printf(">> \tcwd=%s\n", str);      // OUPUT: cwd=flash:/
     f_mount(0, "flash", 0);
 
     testDone = true;

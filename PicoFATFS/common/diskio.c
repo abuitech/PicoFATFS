@@ -53,7 +53,7 @@ DSTATUS disk_initialize(
     DSTATUS stat;
     int result;
 
-    printf("disk_initialize: pdrv=%i\n", pdrv);
+    // printf("disk_initialize: pdrv=%i\n", pdrv);
 
     if (pdrv == EDriveType_Flash)
     {
@@ -125,7 +125,7 @@ DRESULT disk_ioctl(
     DRESULT res;
     int result;
 
-    printf("disk_ioctl: pdrv=%i\n", pdrv);
+    // printf("disk_ioctl: pdrv=%i\n", pdrv);
 
     if (pdrv == EDriveType_Flash)
     {
