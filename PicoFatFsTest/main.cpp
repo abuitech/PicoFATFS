@@ -64,7 +64,7 @@ void blink_led_task(void)
     }
     start_ms += interval_ms;
 
-    printf("Led state : %s\n", led_state ? "on" : "off");
+    // printf("Led state : %s\n", led_state ? "on" : "off");
     board_led_write(led_state);
     led_state = !led_state;
 }
@@ -79,6 +79,8 @@ void CopyTest(const char* srcFilepath, const char* dstFilepath)
     FRESULT fr;
     FIL srcFil, dstFil;
 
+    printf("CopyTest: copy '%s' to '%s'\n", srcFilepath, dstFilepath);
+    
     FILINFO fno;
     if ((fr = f_stat(srcFilepath, &fno)) != FR_OK)
     {
@@ -119,6 +121,9 @@ void CopyTest(const char* srcFilepath, const char* dstFilepath)
         }
 
         copyCount += nWrite;
+
+        tud_task(); // tinyusb device task
+        cdc_task();
     }
 
     printf("CopyTest done.");
