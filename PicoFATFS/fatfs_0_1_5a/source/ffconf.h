@@ -133,7 +133,7 @@
 /  ff_memfree() exemplified in ffsystem.c, need to be added to the project. */
 
 
-#define FF_LFN_UNICODE	0
+#define FF_LFN_UNICODE	2
 /* This option switches the character encoding on the API when LFN is enabled.
 /
 /   0: ANSI/OEM in current CP (TCHAR = char)
@@ -203,7 +203,7 @@
 /  GET_SECTOR_SIZE command. */
 
 
-#define FF_LBA64		0
+#define FF_LBA64		1
 /* This option switches support for 64-bit LBA. (0:Disable or 1:Enable)
 /  To enable the 64-bit LBA, also exFAT needs to be enabled. (FF_FS_EXFAT == 1) */
 
@@ -213,7 +213,7 @@
 /  f_fdisk(). 2^32 sectors maximum. This option has no effect when FF_LBA64 == 0. */
 
 
-#define FF_USE_TRIM		1
+#define FF_USE_TRIM		0
 /* This option switches support for ATA-TRIM. (0:Disable or 1:Enable)
 /  To enable this feature, also CTRL_TRIM command should be implemented to
 /  the disk_ioctl(). */
@@ -231,7 +231,7 @@
 /  buffer in the filesystem object (FATFS) is used for the file data transfer. */
 
 
-#define FF_FS_EXFAT		0
+#define FF_FS_EXFAT		1
 /* This option switches support for exFAT filesystem. (0:Disable or 1:Enable)
 /  To enable exFAT, also LFN needs to be enabled. (FF_USE_LFN >= 1)
 /  Note that enabling exFAT discards ANSI C (C89) compatibility. */
@@ -263,7 +263,7 @@
 */
 
 
-#define FF_FS_LOCK		0
+#define FF_FS_LOCK		16
 /* The option FF_FS_LOCK switches file lock function to control duplicated file open
 /  and illegal operation to open objects. This option must be 0 when FF_FS_READONLY
 /  is 1.

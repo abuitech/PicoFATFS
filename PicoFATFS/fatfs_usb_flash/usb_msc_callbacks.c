@@ -9,7 +9,7 @@
 // Invoked when device is mounted
 void tud_mount_cb(void)
 {
-    printf("Device mounted\n");
+    printf("USB Device mounted\n");
     if (!mount_fatfs_disk())
     {
         printf("\tCreating FAT Filesystem disk\n");
@@ -20,7 +20,7 @@ void tud_mount_cb(void)
 // Invoked when device is unmounted
 void tud_umount_cb(void)
 {
-    printf("Device unmounted\n");
+    printf("USB Device unmounted\n");
 }
 
 // Invoked when usb bus is suspended

@@ -15,6 +15,32 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+DSTATUS fatfs_sd_disk_status(BYTE pdrv);
+DSTATUS fatfs_sd_disk_initialize(BYTE pdrv);
+DRESULT fatfs_sd_disk_read(BYTE pdrv,    /* Physical drive number to identify the drive */
+                  BYTE *buff,   /* Data buffer to store read data */
+                  LBA_t sector, /* Start sector in LBA */
+                  UINT count /* Number of sectors to read */
+                );
+DRESULT fatfs_sd_disk_write(BYTE pdrv,        /* Physical drive number to identify the drive */
+                   const BYTE *buff, /* Data to be written */
+                   LBA_t sector,     /* Start sector in LBA */
+                   UINT count        /* Number of sectors to write */
+                );
+DRESULT fatfs_sd_disk_ioctl(BYTE pdrv, /* Physical drive number (0..) */
+                   BYTE cmd,  /* Control code */
+                   void *buff /* Buffer to send/receive control data */
+                );
+#ifdef __cplusplus
+}
+#endif
+
+
 /*-----------------------------------------------------------------------*/
 /* Get Drive Status                                                      */
 /*-----------------------------------------------------------------------*/
@@ -37,7 +63,7 @@ DSTATUS disk_status(
         return STA_NOINIT;
 
     case EDriveType_SD:
-        return STA_NOINIT;
+        return fatfs_sd_disk_status(pdrv);
     }
     return STA_NOINIT;
 }
@@ -50,15 +76,20 @@ DSTATUS disk_initialize(
     BYTE pdrv /* Physical drive nmuber to identify the drive */
 )
 {
-    DSTATUS stat;
-    int result;
-
     // printf("disk_initialize: pdrv=%i\n", pdrv);
 
-    if (pdrv == EDriveType_Flash)
+    switch (pdrv)
     {
+    case EDriveType_Flash:
         return 0;
+
+    case EDriveType_USB:
+        return STA_NOINIT;
+
+    case EDriveType_SD:
+        return fatfs_sd_disk_initialize(pdrv);
     }
+
     return STA_NOINIT;
 }
 
@@ -73,13 +104,16 @@ DRESULT disk_read(
     UINT count    /* Number of sectors to read */
 )
 {
-    DRESULT res;
-    int result;
-
-    if (pdrv == EDriveType_Flash)
+    switch (pdrv)
     {
-        res = fatfs_disk_read((uint8_t *)buff, sector, count);
-        return res;
+    case EDriveType_Flash:
+        return fatfs_disk_read((uint8_t *)buff, sector, count);
+
+    case EDriveType_USB:
+        return RES_PARERR;
+
+    case EDriveType_SD:
+        return fatfs_sd_disk_read(pdrv, buff, sector, count);
     }
 
     return RES_PARERR;
@@ -98,13 +132,16 @@ DRESULT disk_write(
     UINT count        /* Number of sectors to write */
 )
 {
-    DRESULT res;
-    int result;
-
-    if (pdrv == EDriveType_Flash)
+    switch (pdrv)
     {
-        res = fatfs_disk_write((const uint8_t *)buff, sector, count);
-        return res;
+    case EDriveType_Flash:
+        return fatfs_disk_write((uint8_t *)buff, sector, count);
+
+    case EDriveType_USB:
+        return RES_PARERR;
+
+    case EDriveType_SD:
+        return fatfs_sd_disk_write(pdrv, buff, sector, count);
     }
 
     return RES_PARERR;
@@ -122,12 +159,11 @@ DRESULT disk_ioctl(
     void *buff /* Buffer to send/receive control data */
 )
 {
-    DRESULT res;
-    int result;
-
     // printf("disk_ioctl: pdrv=%i\n", pdrv);
 
-    if (pdrv == EDriveType_Flash)
+    switch (pdrv)
+    {
+    case EDriveType_Flash:
     {
         switch (cmd)
         {
@@ -148,6 +184,13 @@ DRESULT disk_ioctl(
         default:
             return RES_PARERR;
         }
+    }
+
+    case EDriveType_USB:
+        return RES_PARERR;
+
+    case EDriveType_SD:
+        return fatfs_sd_disk_ioctl(pdrv, cmd, buff);
     }
 
     return RES_PARERR;

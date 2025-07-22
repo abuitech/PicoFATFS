@@ -423,6 +423,13 @@ void ff_mutex_give (int vol);		/* Unlock sync object */
 #define AM_ARC	0x20	/* Archive */
 
 
+#ifdef PICOFATFS_DEBUG_LOG
+#include <stdio.h>
+#define PICOFATFS_DBG_LOG(...) printf(__VA_ARGS__)
+#else
+#define PICOFATFS_DBG_LOG(...)
+#endif // PICOFATFS_DEBUG_LOG
+
 #ifdef __cplusplus
 }
 #endif

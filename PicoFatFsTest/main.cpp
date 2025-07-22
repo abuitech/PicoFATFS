@@ -74,21 +74,21 @@ void blink_led_task(void)
 //--------------------------------------------------------------------+
 void CopyTest(const char* srcFilepath, const char* dstFilepath)
 {
-    const UINT BufferSize{512};
+    const UINT BufferSize{256};
     uint8_t buffer[BufferSize];
     FRESULT fr;
     FIL srcFil, dstFil;
 
-    printf(">> CopyTest: copy '%s' to '%s'\n", srcFilepath, dstFilepath);
+    printf("\n>> CopyTest: copy '%s' to '%s'\n", srcFilepath, dstFilepath);
 
     FILINFO fno;
 
     if ((fr = f_stat(dstFilepath, &fno)) == FR_OK)
     {
-        printf(">> Target file '%s' exists. Deleting target file.\n", dstFilepath);
+        printf(">> \tTarget file '%s' exists. Deleting target file.\n", dstFilepath);
         if (f_unlink(dstFilepath) != FR_OK)
         {
-            printf(">> CopyTest has failed! Error deleting target file.\n");
+            printf(">> \tCopyTest has failed! Error deleting target file.\n");
             return;
         }
     }
@@ -98,7 +98,7 @@ void CopyTest(const char* srcFilepath, const char* dstFilepath)
 
     if ((fr = f_stat(srcFilepath, &fno)) != FR_OK)
     {
-        printf(">> CopyTest has failed! Error on f_stat('%s') (fr=%i)\n", srcFilepath, fr);
+        printf(">> \tCopyTest has failed! Error on f_stat('%s') (fr=%i)\n", srcFilepath, fr);
         return;
     }
 
@@ -107,13 +107,13 @@ void CopyTest(const char* srcFilepath, const char* dstFilepath)
 
     if ((fr = f_open(&srcFil, srcFilepath, FA_OPEN_EXISTING | FA_READ)) != FR_OK)
     {
-        printf(">> CopyTest has failed! Error on opening '%s' (fr=%i)\n", srcFilepath, fr);
+        printf(">> \tCopyTest has failed! Error on opening '%s' (fr=%i)\n", srcFilepath, fr);
         return;
     }
 
     if ((fr = f_open(&dstFil, dstFilepath, FA_CREATE_ALWAYS | FA_WRITE)) != FR_OK)
     {
-        printf(">> CopyTest has failed! Error on opening '%s' (fr=%i)\n", dstFilepath, fr);
+        printf(">> \tCopyTest has failed! Error on opening '%s' (fr=%i)\n", dstFilepath, fr);
         f_close(&srcFil);
         return;
     }
@@ -124,12 +124,12 @@ void CopyTest(const char* srcFilepath, const char* dstFilepath)
     FSIZE_t copyCount{0};
     while (copyCount < fno.fsize)
     {
-        UINT nToRead{std::min((FSIZE_t)BufferSize, fno.fsize - copyCount)};
+        UINT nToRead{(UINT)std::min((FSIZE_t)BufferSize, fno.fsize - copyCount)};
         UINT nRead{0}, nWrite{0};
         fr = f_read(&srcFil, buffer, nToRead, &nRead);
         if (fr != FR_OK || nRead != nToRead)
         {
-            printf(">> CopyTest has failed! Error on reading '%s' (fr=%i, copyCount=%lu, nToRead=%lu, nRead=%lu)\n", dstFilepath, fr, copyCount, nToRead, nRead);
+            printf(">> \tCopyTest has failed! Error on reading '%s' (fr=%i, copyCount=%lu, nToRead=%lu, nRead=%lu)\n", dstFilepath, fr, copyCount, nToRead, nRead);
             goto CopyTest_exit;
         }
 
@@ -139,61 +139,95 @@ void CopyTest(const char* srcFilepath, const char* dstFilepath)
         fr = f_write(&dstFil, buffer, nRead, &nWrite);
         if (fr != FR_OK || nWrite != nRead)
         {
-            printf(">> CopyTest has failed! Error on writing '%s' (fr=%i, copyCount=%lu, nToWrite=%lu, nWrite=%lu)\n", dstFilepath, fr, copyCount, nRead, nWrite);
+            printf(">> \tCopyTest has failed! Error on writing '%s' (fr=%i, copyCount=%lu, nToWrite=%lu, nWrite=%lu)\n", dstFilepath, fr, copyCount, nRead, nWrite);
             goto CopyTest_exit;
         }
 
         copyCount += nWrite;
 
-        f_sync(&dstFil);
 
         tud_task(); // tinyusb device task
         cdc_task();
     }
 
-    printf(">> CopyTest done : %lu bytes are copied (source file size:%lu).\n", copyCount, fno.fsize);
+    printf(">> \tCopyTest done : %llu bytes are copied (source file size:%llu).\n", copyCount, fno.fsize);
 
 CopyTest_exit:
     f_close(&dstFil);
     f_close(&srcFil);
 }
 
-//--------------------------------------------------------------------+
-//
-//--------------------------------------------------------------------+
-void TestSample()
+void TestCreateAndWriteFile(const char* filepath, const char* text)
 {
-    static bool testDone = false;
-    if (testDone)
-        return;
-
-    printf(">> Executing... TestSample()!\n");
-
-    TCHAR str[FF_MAX_LFN];
     FRESULT fr;
     FIL fil;
 
-    f_open(&fil, "/test1.txt", FA_CREATE_NEW | FA_WRITE);
-    f_puts("flash:/test1.txt ...", &fil);
+    f_open(&fil, filepath, FA_CREATE_NEW | FA_WRITE);
+    f_puts(text, &fil);
     f_close(&fil);
-
-    f_open(&fil, "flash:/test2.txt", FA_CREATE_NEW | FA_WRITE);
-    f_puts("flash:/test2.txt ...", &fil);
-    f_close(&fil);
-
-    f_mkdir("flash:/test_folder");
-    f_open(&fil, "flash:/test_folder/test_in_test_folder.txt", FA_CREATE_NEW | FA_WRITE);
-    f_puts("flash:/test_folder/test_in_test_folder.txt ...", &fil);
-    f_close(&fil);
-
-    CopyTest("/copytest_source.bin", "/copytest_target.bin");
-
-    fr = f_getcwd(str, FF_MAX_LFN);
-    printf(">> \tcwd=%s\n", str);      // OUPUT: cwd=flash:/
-    f_mount(0, "flash", 0);
-
-    testDone = true;
 }
+
+//--------------------------------------------------------------------+
+//
+//--------------------------------------------------------------------+
+void TestSample(const char* drive)
+{
+    printf("\n>> Executing... TestSample() on drive '%s'!\n", drive);
+
+    printf(">> \tf_mount(&fs, \"%s\", 1)\n", drive);
+    FATFS fs;
+    if (f_mount(&fs, drive, 1) != FR_OK)
+    {
+        printf(">> \tError: mount has failed!\n");
+        return;
+    }
+
+    TCHAR fpath1[FF_MAX_LFN];
+    TCHAR fpath2[FF_MAX_LFN];
+    TCHAR str[FF_MAX_LFN];
+    FRESULT fr;
+
+    sprintf(fpath1, "%s/test1.txt", drive);
+    sprintf(str, "%s...", fpath1);
+    TestCreateAndWriteFile(fpath1, str);
+
+    sprintf(fpath1, "%s/test_folder", drive);
+    fr = f_mkdir(fpath1);
+    if (fr == FR_OK)
+    {
+        sprintf(fpath2, "%s/test_folder/test_in_test_folder.txt", drive);
+        sprintf(str, "%s...", fpath2);
+        TestCreateAndWriteFile(fpath2, str);
+    }
+    else
+    {
+        printf(">> \tf_mkdir(\"%s\") has failed ! (err=%i)\n", fpath1, fr);
+    }
+
+    fr = f_chdir(fpath1);
+    if (fr == FR_OK)
+    {
+        fr = f_getcwd(fpath1, FF_MAX_LFN);
+        printf(">> \tcwd=%s\n", fpath1); // OUPUT: cwd=flash:/
+    }
+    else
+    {
+        printf(">> \tf_chdir(\"%s\") has failed ! (err=%i)\n", fpath1, fr);
+    }
+
+    // sprintf(fpath1, "%s/copytest_source.bin", drive);
+    // sprintf(fpath2, "%s/copytest_target.bin", drive);
+    // CopyTest(fpath1, fpath2);
+
+    f_mount(0, drive, 0);
+}
+
+enum class ETestStep
+{
+    Flash,
+    SD,
+    done
+};
 
 //--------------------------------------------------------------------+
 //
@@ -215,19 +249,44 @@ int main()
         create_fatfs_disk();
     }
 
-    printf("Executing... f_mount(&fs, \"flash\", 0)\n");
-    FATFS fs;
-    if (f_mount(&fs, "flash", 0) != FR_OK)
-    {
-        printf("\tError:mount has failed!\n");
-    }
+
+    ETestStep testStep{ETestStep::Flash};
 
     while (true)
     {
         tud_task(); // tinyusb device task
         cdc_task();
 
+        switch (testStep)
+        {
+        case ETestStep::Flash:
+            TestSample("FLASH:");
+            testStep = ETestStep::SD;
+            break;
+        case ETestStep::SD:
+            TestSample("SD:");
+            testStep = ETestStep::done;
+            break;
+
+        default:
+            break;
+        }
+
         blink_led_task();
-        TestSample();
     }
+}
+
+/* Implement library message callbacks */
+void put_out_error_message(const char *s)
+{
+    printf("*** Error:%s\n", s);
+}
+void put_out_info_message(const char *s)
+{
+    printf("*** Info:%s\n", s);
+}
+// This will not be called unless build_flags include "-D USE_DBG_PRINTF":
+void put_out_debug_message(const char *s)
+{
+    printf("*** Debug:%s\n", s);
 }

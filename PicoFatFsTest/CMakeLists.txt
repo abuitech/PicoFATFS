@@ -23,23 +23,36 @@ if (EXISTS ${picoVscode})
     include(${picoVscode})
 endif()
 # ====================================================================================
-set(PICO_BOARD myboard_pico CACHE STRING "Board type")
-set(PICO_BOARD_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR})
+option(PICO_1_GEN "Pico 1 generation (ON) or Pico 2 generation (OFF)" OFF)
+
+IF (PICO_1_GEN)
+    set(PICO_BOARD myboard_pico CACHE STRING "Board type")
+    set(PICO_BOARD_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR})
+    set(TARGET_PLATFORM rp2040)
+    set(PlatformDefineList
+        PICO_PLATFORM=${TARGET_PLATFORM}
+    )
+ELSE (PICO_1_GEN)
+    set(PICO_BOARD myboard_pga2350 CACHE STRING "Board type")
+    set(PICO_BOARD_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR})
+    set(TARGET_PLATFORM rp2350)
+    set(PlatformDefineList
+        PICO_PLATFORM=${TARGET_PLATFORM}
+    )
+ENDIF (PICO_1_GEN)
 
 set(PICOFATFS_ROOT_DIR ../PicoFATFS)
 
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico_sdk_import.cmake)
 
-# PicoFatFS shared cmake
-include(${PICOFATFS_ROOT_DIR}/shared.cmake)
 
 # ====================================================================================
 #
 #
 
-set(TARGET_VERSION v0.3)
-set(TARGET_NAME PicoFatFsTest_${TARGET_VERSION})
+set(TARGET_VERSION v0.4)
+set(TARGET_NAME PicoFatFsTest_${TARGET_PLATFORM}_${TARGET_VERSION})
 
 #
 #
@@ -68,6 +81,7 @@ set(IncludePaths
 # ====================================================================================
 set(SourceFileList
     ${CMAKE_CURRENT_LIST_DIR}/main.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/sd_hw_config.c
 )
 
 # ====================================================================================
@@ -83,9 +97,10 @@ set(LibList
 # Defines list
 # ====================================================================================
 set(DefineList
+    ${PlatformDefineList}
     #HAS_DEV_FLASH_IMPL
+    # USE_PRINTF=1
     FATFS_FLASH_CONF="fatfs_flash_conf.h"
-    PICO_PLATFORM=rp2040
     # SYS_CLK_MHZ=360
     # PLL_SYS_VCO_FREQ_HZ=1500000000
     # PLL_SYS_POSTDIV1=5

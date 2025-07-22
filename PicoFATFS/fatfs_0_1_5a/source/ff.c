@@ -479,7 +479,7 @@ static volatile BYTE SysLockVolume;	/* Volume id who is locking Files[] */
 
 #if FF_STR_VOLUME_ID
 #ifdef FF_VOLUME_STRS
-static const char *const VolumeStr[FF_VOLUMES] = {FF_VOLUME_STRS};	/* Pre-defined volume ID */
+/*static*/ const char *const VolumeStr[FF_VOLUMES] = {FF_VOLUME_STRS};	/* Pre-defined volume ID */
 #endif
 #endif
 
@@ -3161,6 +3161,8 @@ static int get_ldnumber (	/* Returns logical drive number (-1:invalid drive numb
 	const TCHAR** path		/* Pointer to pointer to the path name */
 )
 {
+    PICOFATFS_DBG_LOG("[get_ldnumber] path=%s\n", *path);
+
 	const TCHAR *tp;
 	const TCHAR *tt;
 	TCHAR chr;
@@ -3196,6 +3198,7 @@ static int get_ldnumber (	/* Returns logical drive number (-1:invalid drive numb
 #endif
 		if (i >= FF_VOLUMES) return -1;	/* Not found or invalid volume ID */
 		*path = tt;		/* Snip the drive prefix off */
+        PICOFATFS_DBG_LOG("[get_ldnumber] return %i\n", i);
 		return i;		/* Return the found drive number */
 	}
 #if FF_STR_VOLUME_ID == 2		/* Unix style volume ID is enabled */
@@ -3212,11 +3215,13 @@ static int get_ldnumber (	/* Returns logical drive number (-1:invalid drive numb
 		} while ((vchr || (chr != '/' && !IsTerminator(chr))) && ++i < FF_VOLUMES);	/* Repeat for each ID until pattern match */
 		if (i >= FF_VOLUMES) return -1;	/* Not found (invalid volume ID) */
 		*path = tt;		/* Snip the node name off */
+        PICOFATFS_DBG_LOG("[get_ldnumber] return %i\n", i);
 		return i;		/* Return the found drive number */
 	}
 #endif
 	/* No drive prefix */
 #if FF_FS_RPATH != 0
+    PICOFATFS_DBG_LOG("[get_ldnumber] return %i (CurrVol)\n", (int)CurrVol);
 	return (int)CurrVol;	/* Default drive is current drive */
 #else
 	return 0;				/* Default drive is 0 */
