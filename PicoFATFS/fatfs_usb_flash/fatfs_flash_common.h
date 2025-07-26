@@ -12,7 +12,6 @@
 enum EDriveType
 {
     EDriveType_Flash,
-    EDriveType_USB,
     EDriveType_SD
 };
 

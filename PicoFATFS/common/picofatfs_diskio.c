@@ -52,15 +52,12 @@ DSTATUS disk_status(
     DSTATUS stat;
     int result;
 
-    // printf("disk_status: pdrv=%i\n", pdrv);
+    printf("disk_status: pdrv=%i\n", pdrv);
 
     switch (pdrv)
     {
     case EDriveType_Flash:
         return 0;
-
-    case EDriveType_USB:
-        return STA_NOINIT;
 
     case EDriveType_SD:
         return fatfs_sd_disk_status(pdrv);
@@ -76,15 +73,12 @@ DSTATUS disk_initialize(
     BYTE pdrv /* Physical drive nmuber to identify the drive */
 )
 {
-    // printf("disk_initialize: pdrv=%i\n", pdrv);
+    printf("disk_initialize: pdrv=%i\n", pdrv);
 
     switch (pdrv)
     {
     case EDriveType_Flash:
         return 0;
-
-    case EDriveType_USB:
-        return STA_NOINIT;
 
     case EDriveType_SD:
         return fatfs_sd_disk_initialize(pdrv);
@@ -108,9 +102,6 @@ DRESULT disk_read(
     {
     case EDriveType_Flash:
         return fatfs_disk_read((uint8_t *)buff, sector, count);
-
-    case EDriveType_USB:
-        return RES_PARERR;
 
     case EDriveType_SD:
         return fatfs_sd_disk_read(pdrv, buff, sector, count);
@@ -136,9 +127,6 @@ DRESULT disk_write(
     {
     case EDriveType_Flash:
         return fatfs_disk_write((uint8_t *)buff, sector, count);
-
-    case EDriveType_USB:
-        return RES_PARERR;
 
     case EDriveType_SD:
         return fatfs_sd_disk_write(pdrv, buff, sector, count);
@@ -185,9 +173,6 @@ DRESULT disk_ioctl(
             return RES_PARERR;
         }
     }
-
-    case EDriveType_USB:
-        return RES_PARERR;
 
     case EDriveType_SD:
         return fatfs_sd_disk_ioctl(pdrv, cmd, buff);

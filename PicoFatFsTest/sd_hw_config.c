@@ -62,18 +62,19 @@ size_t sd_get_num() { return FF_VOLUMES; }
  */
 sd_card_t *sd_get_by_num(size_t num)
 {
-    if (2 == num) {
-        // The number 0 is a valid SD card number.
-        // Return a pointer to the sd_card object.
+    if (1 == num)
+    {
         return &sd_card;
-    } else {
+    }
+    else
+    {
         // The number is invalid. Return @c NULL.
         return NULL;
     }
 }
 
 #ifndef FF_VOLUME_STRS
-const char * VolumeStr[FF_VOLUMES] = {"FLASH","USB","SD"};
+const char * VolumeStr[FF_VOLUMES] = {"FLASH","SD"};
 #endif
 
 /* [] END OF FILE */
