@@ -15,7 +15,7 @@
 
 #include <algorithm>
 
-
+extern bool UsbConnected;
 
 //--------------------------------------------------------------------+
 //
@@ -72,7 +72,7 @@ void blink_led_task(void)
 //--------------------------------------------------------------------+
 //
 //--------------------------------------------------------------------+
-void CopyTest(const char* srcFilepath, const char* dstFilepath)
+void CopyTest(const TCHAR* srcFilepath, const TCHAR* dstFilepath)
 {
     const UINT BufferSize{256};
     uint8_t buffer[BufferSize];
@@ -157,7 +157,7 @@ CopyTest_exit:
     f_close(&srcFil);
 }
 
-void TestCreateAndWriteFile(const char* filepath, const char* text)
+void TestCreateAndWriteFile(const TCHAR* filepath, const TCHAR* text)
 {
     FRESULT fr;
     FIL fil;
@@ -170,7 +170,7 @@ void TestCreateAndWriteFile(const char* filepath, const char* text)
 //--------------------------------------------------------------------+
 //
 //--------------------------------------------------------------------+
-void TestSample(const char* drive)
+void TestSample(const TCHAR* drive)
 {
     printf("\n>> Executing... TestSample() on drive '%s'!\n", drive);
 
@@ -215,15 +215,16 @@ void TestSample(const char* drive)
         printf(">> \tf_chdir(\"%s\") has failed ! (err=%i)\n", fpath1, fr);
     }
 
-    // sprintf(fpath1, "%s/copytest_source.bin", drive);
-    // sprintf(fpath2, "%s/copytest_target.bin", drive);
-    // CopyTest(fpath1, fpath2);
+    sprintf(fpath1, "%s/copytest_source.bin", drive);
+    sprintf(fpath2, "%s/copytest_target.bin", drive);
+    CopyTest(fpath1, fpath2);
 
     f_mount(0, drive, 0);
 }
 
 enum class ETestStep
 {
+    WaitUsbConnected,
     Flash,
     SD,
     done
@@ -250,7 +251,7 @@ int main()
     }
 
 
-    ETestStep testStep{ETestStep::Flash};
+    ETestStep testStep{ETestStep::WaitUsbConnected};
 
     while (true)
     {
@@ -259,10 +260,16 @@ int main()
 
         switch (testStep)
         {
+        case ETestStep::WaitUsbConnected:
+            if (UsbConnected)
+                testStep = ETestStep::Flash;
+            break;
+
         case ETestStep::Flash:
             TestSample("FLASH:");
             testStep = ETestStep::SD;
             break;
+
         case ETestStep::SD:
             TestSample("SD:");
             testStep = ETestStep::done;

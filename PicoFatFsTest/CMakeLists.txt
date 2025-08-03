@@ -23,7 +23,7 @@ if (EXISTS ${picoVscode})
     include(${picoVscode})
 endif()
 # ====================================================================================
-option(PICO_1_GEN "Pico 1 generation (ON) or Pico 2 generation (OFF)" OFF)
+option(PICO_1_GEN "Pico 1 generation (ON) or Pico 2 generation (OFF)" ON)
 
 IF (PICO_1_GEN)
     set(PICO_BOARD myboard_pico CACHE STRING "Board type")

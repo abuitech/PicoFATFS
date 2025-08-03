@@ -52,7 +52,7 @@ DSTATUS disk_status(
     DSTATUS stat;
     int result;
 
-    printf("disk_status: pdrv=%i\n", pdrv);
+    // printf("disk_status: pdrv=%i\n", pdrv);
 
     switch (pdrv)
     {
@@ -73,7 +73,7 @@ DSTATUS disk_initialize(
     BYTE pdrv /* Physical drive nmuber to identify the drive */
 )
 {
-    printf("disk_initialize: pdrv=%i\n", pdrv);
+    // printf("disk_initialize: pdrv=%i\n", pdrv);
 
     switch (pdrv)
     {

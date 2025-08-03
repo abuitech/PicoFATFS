@@ -6,9 +6,12 @@
 // Device callbacks
 //--------------------------------------------------------------------+
 
+bool UsbConnected = 0;
+
 // Invoked when device is mounted
 void tud_mount_cb(void)
 {
+    UsbConnected = true;
     printf("USB Device mounted\n");
     if (!mount_fatfs_disk())
     {
@@ -20,6 +23,7 @@ void tud_mount_cb(void)
 // Invoked when device is unmounted
 void tud_umount_cb(void)
 {
+    UsbConnected = false;
     printf("USB Device unmounted\n");
 }
 
