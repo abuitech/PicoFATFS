@@ -129,7 +129,7 @@ void CopyTest(const TCHAR* srcFilepath, const TCHAR* dstFilepath)
         fr = f_read(&srcFil, buffer, nToRead, &nRead);
         if (fr != FR_OK || nRead != nToRead)
         {
-            printf(">> \tCopyTest has failed! Error on reading '%s' (fr=%i, copyCount=%lu, nToRead=%lu, nRead=%lu)\n", dstFilepath, fr, copyCount, nToRead, nRead);
+            printf(">> \tCopyTest has failed! Error on reading '%s' (fr=%i, copyCount=%llu, nToRead=%u, nRead=%u)\n", dstFilepath, fr, copyCount, nToRead, nRead);
             goto CopyTest_exit;
         }
 
@@ -139,7 +139,7 @@ void CopyTest(const TCHAR* srcFilepath, const TCHAR* dstFilepath)
         fr = f_write(&dstFil, buffer, nRead, &nWrite);
         if (fr != FR_OK || nWrite != nRead)
         {
-            printf(">> \tCopyTest has failed! Error on writing '%s' (fr=%i, copyCount=%lu, nToWrite=%lu, nWrite=%lu)\n", dstFilepath, fr, copyCount, nRead, nWrite);
+            printf(">> \tCopyTest has failed! Error on writing '%s' (fr=%i, copyCount=%llu, nToWrite=%u, nWrite=%u)\n", dstFilepath, fr, copyCount, nRead, nWrite);
             goto CopyTest_exit;
         }
 
@@ -159,7 +159,6 @@ CopyTest_exit:
 
 void TestCreateAndWriteFile(const TCHAR* filepath, const TCHAR* text)
 {
-    FRESULT fr;
     FIL fil;
 
     f_open(&fil, filepath, FA_CREATE_NEW | FA_WRITE);
@@ -184,7 +183,7 @@ void TestSample(const TCHAR* drive)
 
     TCHAR fpath1[FF_MAX_LFN];
     TCHAR fpath2[FF_MAX_LFN];
-    TCHAR str[FF_MAX_LFN];
+    TCHAR str[FF_MAX_LFN+3];
     FRESULT fr;
 
     sprintf(fpath1, "%s/test1.txt", drive);
