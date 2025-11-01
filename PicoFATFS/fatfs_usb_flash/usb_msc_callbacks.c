@@ -1,5 +1,7 @@
 #include "usb_msc_callbacks.h"
+#include "fatfs_flash.h"
 #include "fatfs_disk.h"
+#include "ff.h"
 #include "tusb.h"
 
 //--------------------------------------------------------------------+
@@ -13,10 +15,15 @@ void tud_mount_cb(void)
 {
     UsbConnected = true;
     printf("USB Device mounted\n");
-    if (!mount_fatfs_disk())
+    FATFS filesystem;
+    if (f_mount(&filesystem, "", 1) != FR_OK)
     {
         printf("\tCreating FAT Filesystem disk\n");
-        create_fatfs_disk();
+        create_builtin_flash_drive();
+        if (f_mount(&filesystem, "", 1) != FR_OK)
+        {
+            printf("\tError : FAT Filesystem disk creation has failed !\n");
+        }
     }
 }
 

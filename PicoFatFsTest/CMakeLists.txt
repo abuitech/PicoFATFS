@@ -43,7 +43,7 @@ set(DefineList
 #
 #
 
-set(TARGET_VERSION v0.5)
+set(TARGET_VERSION v0.6)
 set(TARGET_NAME PicoFatFsTest_${TARGET_PLATFORM}_${TARGET_VERSION})
 
 #
@@ -53,6 +53,8 @@ set(TARGET_NAME PicoFatFsTest_${TARGET_PLATFORM}_${TARGET_VERSION})
 
 # Add executable. Default name is the project name, version 0.1
 add_executable(${TARGET_NAME} ${SourceFileList})
+
+pico_set_linker_script(${TARGET_NAME} ../PicoFATFS/fatfs_usb_flash/memmap_custom.ld)
 
 pico_set_program_name(${TARGET_NAME} "PicoFATFS")
 pico_set_program_version(${TARGET_NAME} "${TARGET_VERSION}")

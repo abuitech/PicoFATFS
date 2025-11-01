@@ -46,11 +46,12 @@ set (FatFsLibList
 
 # ... source folder
 set(FATFS_USB_FLASH_SOURCE_DIR ${PICOFATFS_SOURCE_DIR}/fatfs_usb_flash)
+set(SPIFTL_SOURCE_DIR ${PICOFATFS_SOURCE_DIR}/SPIFTL)
 
 # ... source files
 set (FatFsUsbImplSourceList
     ${FATFS_USB_FLASH_SOURCE_DIR}/fatfs_disk.c
-    ${FATFS_USB_FLASH_SOURCE_DIR}/fatfs_flash.c
+    ${FATFS_USB_FLASH_SOURCE_DIR}/fatfs_flash.cpp
     ${FATFS_USB_FLASH_SOURCE_DIR}/usb_descriptors.c
     ${FATFS_USB_FLASH_SOURCE_DIR}/usb_msc_callbacks.c
     ${FATFS_USB_FLASH_SOURCE_DIR}/usb_msc_driver.c
@@ -193,8 +194,10 @@ target_sources(PicoFATFS INTERFACE
 target_include_directories(PicoFATFS INTERFACE
     ${FATFS_SOURCE_DIR}
     ${FATFS_USB_FLASH_SOURCE_DIR}
+    ${SPIFTL_SOURCE_DIR}
     ${FATFS_SD_INCLUDE_DIR_LIST}
     ${FATFS_SD_SOURCE_SPI_SRC_DIR}
+    ${CMAKE_CURRENT_LIST_DIR}
 )
 
 

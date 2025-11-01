@@ -10,7 +10,8 @@
 #include "ff.h"     /* Obtains integer types */
 #include "diskio.h" /* Declarations of disk functions */
 
-#include "fatfs_disk.h"
+#include "fatfs_flash_common.h"
+#include "fatfs_flash.h"
 
 #include <stdio.h>
 #include "pico/stdlib.h"
@@ -49,15 +50,12 @@ DSTATUS disk_status(
     BYTE pdrv /* Physical drive nmuber to identify the drive */
 )
 {
-    DSTATUS stat;
-    int result;
-
     // printf("disk_status: pdrv=%i\n", pdrv);
 
     switch (pdrv)
     {
     case EDriveType_Flash:
-        return 0;
+        return RES_OK;
 
     case EDriveType_SD:
         return fatfs_sd_disk_status(pdrv);
@@ -78,7 +76,7 @@ DSTATUS disk_initialize(
     switch (pdrv)
     {
     case EDriveType_Flash:
-        return 0;
+        return flash_init() ? RES_OK : RES_ERROR;
 
     case EDriveType_SD:
         return fatfs_sd_disk_initialize(pdrv);
@@ -101,7 +99,17 @@ DRESULT disk_read(
     switch (pdrv)
     {
     case EDriveType_Flash:
-        return fatfs_disk_read((uint8_t *)buff, sector, count);
+    {
+        if (sector > get_lba_count())
+        {
+            return RES_ERROR;
+        }
+        for (unsigned int i = 0; i < count; i++)
+        {
+            flash_read(sector + i, buff + i * get_lba_size());
+        }
+    return RES_OK;
+    }
 
     case EDriveType_SD:
         return fatfs_sd_disk_read(pdrv, buff, sector, count);
@@ -126,7 +134,17 @@ DRESULT disk_write(
     switch (pdrv)
     {
     case EDriveType_Flash:
-        return fatfs_disk_write((uint8_t *)buff, sector, count);
+    {
+        if (sector > get_lba_count())
+        {
+            return RES_ERROR;
+        }
+        for (unsigned int i = 0; i < count; i++)
+        {
+            flash_write(sector + i, buff + i * get_lba_size());
+        }
+        return RES_OK;
+    }
 
     case EDriveType_SD:
         return fatfs_sd_disk_write(pdrv, buff, sector, count);
@@ -156,19 +174,26 @@ DRESULT disk_ioctl(
         switch (cmd)
         {
         case CTRL_SYNC:
-            fatfs_disk_sync();
+            flash_persist();
             return RES_OK;
         case GET_SECTOR_COUNT:
-            *(LBA_t *)buff = FATFS_FLASH_NUM_FAT_SECTORS;
+            *(LBA_t *)buff = get_lba_count();
             return RES_OK;
         case GET_SECTOR_SIZE:
-            *(WORD *)buff = FATFS_FLASH_SECTOR_SIZE;
+            *(WORD *)buff = get_lba_size();
             return RES_OK;
         case GET_BLOCK_SIZE:
-            *(DWORD *)buff = 1;
+            *(DWORD *)buff = get_lba_size();
             return RES_OK;
         case CTRL_TRIM:
+        {
+            LBA_t *lba = (LBA_t *)buff;
+            for (unsigned int i = lba[0]; i < lba[1]; i++)
+            {
+                flash_trim(i);
+            }
             return RES_OK;
+        }
         default:
             return RES_PARERR;
         }

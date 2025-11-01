@@ -1,28 +1,35 @@
-#ifndef FATFS_FLASH_FS_H
-#define FATFS_FLASH_FS_H
+#ifndef _FLASH_H_
+#define _FLASH_H_
 
+#include <ctype.h>
+#include <math.h>
+#include <hardware/flash.h>
+#include <hardware/sync.h>
+#include <pico/stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include "fatfs_flash_common.h"
 
-#include <stdbool.h>
-
-
-#ifdef __cplusplus
-extern "C"
-{
+#ifndef FLASH_DEBUG
+#define FLASH_DEBUG 0
 #endif
 
+extern uint32_t __DRIVE_START[];
+extern uint32_t __DRIVE_LEN[];
+extern uint32_t __DRIVE_END[];
 
-int flash_fs_mount();
-void flash_fs_create();
-void flash_fs_sync();
-void flash_fs_read_FAT_sector(uint16_t fat_sector, void *buffer);
-void flash_fs_write_FAT_sector(uint16_t fat_sector, const void *buffer);
-bool flash_fs_verify_FAT_sector(uint16_t fat_sector, const void *buffer);
-
-
-
+#ifdef __cplusplus
+extern "C" {
+#endif
+bool flash_format();
+bool flash_init();
+bool flash_read(int block, uint8_t *buffer);
+bool flash_write(int block, const uint8_t *buffer);
+uint16_t get_lba_count(); 
+uint16_t get_lba_size(); 
+void flash_persist();
+void flash_trim(int);
 #ifdef __cplusplus
 }
 #endif
-
-#endif // FATFS_FLASH_FS_H
+#endif

@@ -2,6 +2,7 @@
 #include "pico/stdlib.h"
 
 #include "usb_msc_callbacks.h"
+#include "fatfs_flash.h"
 #include "fatfs_disk.h"
 #include "ff.h"
 
@@ -173,6 +174,8 @@ void TestSample(const TCHAR* drive)
 {
     printf("\n>> Executing... TestSample() on drive '%s'!\n", drive);
 
+    flash_init();
+
     printf(">> \tf_mount(&fs, \"%s\", 1)\n", drive);
     FATFS fs;
     if (f_mount(&fs, drive, 1) != FR_OK)
@@ -243,10 +246,15 @@ int main()
     measure_freqs();
 
     printf("Executing... mount_fatfs_disk()\n");
-    if (!mount_fatfs_disk())
+    FATFS filesystem;
+    if (f_mount(&filesystem, "", 1) != FR_OK)
     {
         printf("\tCreating FAT Filesystem disk\n");
-        create_fatfs_disk();
+        create_builtin_flash_drive();
+        if (f_mount(&filesystem, "", 1) != FR_OK)
+        {
+            printf("\tError : FAT Filesystem disk creation has failed !\n");
+        }
     }
 
 
