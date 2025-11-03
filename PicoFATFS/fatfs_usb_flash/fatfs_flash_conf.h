@@ -9,7 +9,7 @@
 #define FATFS_FLASH_NUM_FLASH_SECTORS 3840  // 15megs / 4096bytes = 3840
 #define FATFS_FLASH_SECTOR_SIZE 512
 
-#define FATFS_FLASH_USB_VID "PicoFlashFAT"
+#define FATFS_FLASH_USB_VID "abuitech"
 #define FATFS_FLASH_USB_PID "Mass Storage"
 #define FATFS_FLASH_USB_REV "1.0"
 
