@@ -233,6 +233,15 @@ uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
 // String Descriptors
 //--------------------------------------------------------------------+
 
+// String Descriptor Index
+enum
+{
+    STRID_LANGID = 0,
+    STRID_MANUFACTURER,
+    STRID_PRODUCT,
+    STRID_SERIAL,
+};
+
 // array of pointer to string descriptors
 char const *string_desc_arr[] =
     {
@@ -254,7 +263,7 @@ uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 
     uint8_t chr_count;
 
-    if (index == 0)
+    if (index == STRID_LANGID)
     {
         memcpy(&_desc_str[1], string_desc_arr[0], 2);
         chr_count = 1;
