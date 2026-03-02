@@ -32,6 +32,7 @@ set(DefineList
     #HAS_DEV_FLASH_IMPL
     # USE_PRINTF=1
     FATFS_FLASH_CONF="fatfs_flash_conf.h"
+    FATFS_SD_CONF="fatfs_sd_conf.h"
     # SYS_CLK_MHZ=360
     # PLL_SYS_VCO_FREQ_HZ=1500000000
     # PLL_SYS_POSTDIV1=5

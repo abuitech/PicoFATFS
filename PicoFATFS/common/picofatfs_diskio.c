@@ -10,7 +10,7 @@
 #include "ff.h"     /* Obtains integer types */
 #include "diskio.h" /* Declarations of disk functions */
 
-#include "fatfs_flash_common.h"
+#include "fatfs_common.h"
 #include "fatfs_flash.h"
 
 #include <stdio.h>

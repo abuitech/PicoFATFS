@@ -203,6 +203,7 @@ target_include_directories(PicoFATFS INTERFACE
     ${FATFS_SD_INCLUDE_DIR_LIST}
     ${FATFS_SD_SOURCE_SPI_SRC_DIR}
     ${CMAKE_CURRENT_LIST_DIR}
+    ${PICOFATFS_SOURCE_DIR}/common
 )
 
 

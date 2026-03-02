@@ -8,6 +8,12 @@
 #include FATFS_FLASH_CONF
 #endif
 
+#if !defined(FATFS_SD_CONF)
+#include "fatfs_sd_conf.h"
+#else
+#include FATFS_SD_CONF
+#endif
+
 /* Definitions of physical drive number for each drive */
 enum EDriveType
 {

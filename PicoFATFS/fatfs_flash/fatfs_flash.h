@@ -8,7 +8,7 @@
 #include <pico/stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "fatfs_flash_common.h"
+#include "fatfs_common.h"
 
 #ifndef FLASH_DEBUG
 #define FLASH_DEBUG 0

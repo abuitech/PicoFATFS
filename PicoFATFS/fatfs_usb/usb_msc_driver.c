@@ -47,10 +47,6 @@ uint8_t tud_msc_get_maxlun_cb(void)
 #endif
 }
 
-#define FATFS_SD_USB_VID "abuitech"
-#define FATFS_SD_USB_PID "SD Storage"
-#define FATFS_SD_USB_REV "1.0"
-
 
 // Invoked when received SCSI_CMD_INQUIRY
 // Application fill vendor id, product id and revision with string up to 8, 16, 4 characters respectively
