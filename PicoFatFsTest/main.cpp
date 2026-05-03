@@ -217,8 +217,8 @@ void TestSample(const TCHAR* drive)
         printf(">> \tf_chdir(\"%s\") has failed ! (err=%i)\n", fpath1, fr);
     }
 
-    sprintf(fpath1, "%s/copytest_source.bin", drive);
-    sprintf(fpath2, "%s/copytest_target.bin", drive);
+    sprintf(fpath1, "%s/sd_copytest_source.bin", drive);
+    sprintf(fpath2, "%s/sd_copytest_target.bin", drive);
     CopyTest(fpath1, fpath2);
 
     f_mount(0, drive, 0);

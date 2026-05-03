@@ -33,7 +33,7 @@ endif()
 option(PICO_1_GEN "Pico 1 generation (ON) or Pico 2 generation (OFF)" ON)
 
 IF (PICO_1_GEN)
-    set(PICO_BOARD myboard_pico CACHE STRING "Board type")
+    set(PICO_BOARD myboard_pico1_16M CACHE STRING "Board type")
     set(PICO_BOARD_HEADER_DIRS ${CMAKE_CURRENT_LIST_DIR}/PicoFatFsTest)
     set(TARGET_PLATFORM rp2040)
     set(PlatformDefineList

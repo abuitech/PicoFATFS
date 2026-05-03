@@ -11,7 +11,7 @@ set(PICOFATFS_SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR})
 #
 
 # ... source folder
-set(FATFS_SOURCE_DIR ${PICOFATFS_SOURCE_DIR}/fatfs_0_1_5a/source)
+set(FATFS_SOURCE_DIR ${PICOFATFS_SOURCE_DIR}/fatfs_0_1_6/source)
 
 # ... source files
 set(FatFsSourceList
@@ -53,9 +53,6 @@ set(SPIFTL_SOURCE_DIR ${PICOFATFS_SOURCE_DIR}/SPIFTL)
 set (FatFsUsbImplSourceList
     ${FATFS_FLASH_SOURCE_DIR}/fatfs_disk.c
     ${FATFS_FLASH_SOURCE_DIR}/fatfs_flash.cpp
-    # ${FATFS_FLASH_SOURCE_DIR}/usb_descriptors.c
-    # ${FATFS_FLASH_SOURCE_DIR}/usb_msc_callbacks.c
-    # ${FATFS_FLASH_SOURCE_DIR}/usb_msc_driver.c
     ${FATFS_USB_SOURCE_DIR}/usb_descriptors.c
     ${FATFS_USB_SOURCE_DIR}/usb_msc_callbacks.c
     ${FATFS_USB_SOURCE_DIR}/usb_msc_driver.c
@@ -102,6 +99,7 @@ set(FATFS_SD_SOURCE_DIR_LIST
 )
 # ... source folders
 set(FATFS_SD_INCLUDE_DIR_LIST
+    ${FATFS_SD_SOURCE_ROOT_DIR}
     ${FATFS_SD_SOURCE_SPI_INCLUDE_DIR}
     ${FATFS_SD_SOURCE_SPI_SD_DRIVER_DIR}
 )
@@ -122,7 +120,6 @@ set(FatFsSdSourceList
     ${FATFS_SD_SOURCE_SPI_SRC_DIR}/f_util.c
     ${FATFS_SD_SOURCE_SPI_SRC_DIR}/ff_stdio.c
     ${FATFS_SD_SOURCE_SPI_SRC_DIR}/file_stream.c
-    # ${FATFS_SD_SOURCE_SPI_SRC_DIR}/glue.c
     ${FATFS_SD_SOURCE_SPI_SRC_DIR}/my_debug.c
     ${FATFS_SD_SOURCE_SPI_SRC_DIR}/my_rtc.c
     ${FATFS_SD_SOURCE_SPI_SRC_DIR}/util.c
