@@ -44,7 +44,7 @@ set(DefineList
 #
 #
 
-set(TARGET_VERSION v0.7)
+set(TARGET_VERSION v0.8)
 set(TARGET_NAME PicoFatFsTest_${TARGET_PLATFORM}_${TARGET_VERSION})
 
 #
